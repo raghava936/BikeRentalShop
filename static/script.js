@@ -56,3 +56,21 @@ async function getBikes() {
         list.innerHTML = '<h3>Bike Inventory</h3>' + bikes.map(bike => `<p>ID: ${bike.id}, Model: ${bike.model}</p>`).join('');
     }
 }
+
+
+// Customer Profile Functions
+async function addCustomer() {
+    const customerId = document.getElementById('customerId').value;
+    const customerName = document.getElementById('customerName').value;
+    const customerContact = document.getElementById('customerContact').value;
+    const customerData = { id: customerId, name: customerName, contact: customerContact };
+
+    const data = await postData('customers', customerData);
+    if (data) {
+        document.getElementById('customerId').value = '';
+        document.getElementById('customerName').value = '';
+        document.getElementById('customerContact').value = '';
+        getCustomers(); // Refresh customer list
+    }
+}
+

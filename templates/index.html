@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bike Rental Shop</title>
+    <style>
+        /* General Page Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        /* Centered Container */
+        .container {
+            width: 80%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            font-size: 36px;
+            margin-bottom: 30px;
+        }
+
+        /* Section Styles */
+        h2 {
+            color: #555;
+            font-size: 24px;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 5px;
+        }
+
+        /* Input Fields */
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        /* Button Styles */
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Button Container */
+        button + button {
+            margin-left: 10px;
+        }
+
+        /* List Styles */
+        #bikesList, #customersList {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            margin-top: 20px;
+        }
+
+        #bikesList ul, #customersList ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        #bikesList li, #customersList li {
+            padding: 8px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #bikesList li:last-child, #customersList li:last-child {
+            border-bottom: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+            }
+
+            h1 {
+                font-size: 30px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            button {
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            input[type="text"] {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bike Rental Shop</h1>
+
+        <!-- Bike Inventory Management -->
+        <h2>Bike Inventory</h2>
+        <input type="text" id="bikeId" placeholder="Bike ID">
+        <input type="text" id="bikeModel" placeholder="Bike Model">
+        <button onclick="addBike()">Add Bike</button>
+        <button onclick="getBikes()">Show Bikes</button>
+        <div id="bikesList"></div>
+
+        <!-- Customer Management -->
+        <h2>Customer Profiles</h2>
+        <input type="text" id="customerId" placeholder="Customer ID">
+        <input type="text" id="customerName" placeholder="Customer Name">
+        <input type="text" id="customerContact" placeholder="Customer Contact">
+        <button onclick="addCustomer()">Add Customer</button>
+        <button onclick="getCustomers()">Show Customers</button>
+        <div id="customersList"></div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

@@ -74,3 +74,13 @@ async function addCustomer() {
     }
 }
 
+
+async function getCustomers() {
+    const customers = await getData('customers');
+    if (customers) {
+        const list = document.getElementById('customersList');
+        list.innerHTML = '<h3>Customer Profiles</h3>' + customers.map(customer => `<p>ID: ${customer.id}, Name: ${customer.name}, Contact: ${customer.contact}</p>`).join('');
+    }
+}
+
+

@@ -1,6 +1,6 @@
-# BikeRentalShopAPI
+# BikeRentalShop
 
-# Bike Rental Shop API
+# Bike Rental Shop
 
 This is a simple Bike Rental Shop API built with Flask and SQLite. It allows you to manage bike and customer data for a bike rental service. The API provides endpoints to add and retrieve bikes and customers from a database.
 

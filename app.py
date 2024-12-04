@@ -142,6 +142,20 @@ def update_customer(customer_id):
     except Exception as e:
         return jsonify({'error': f'An error occurred: {e}'}), 500
 
+@app.route('/api/customers/<customer_id>', methods=['DELETE'])
+def delete_customer(customer_id):
+    """Delete a customer from the database."""
+    try:
+        with get_db_connection() as conn:
+            result = conn.execute("DELETE FROM customers WHERE id = ?", (customer_id,))
+            if result.rowcount == 0:
+                return jsonify({'error': 'Customer not found.'}), 404
+        return jsonify({'message': 'Customer deleted successfully.'}), 200
+    except Exception as e:
+        return jsonify({'error': f'An error occurred: {e}'}), 500
+
+
+
 
 # Home Route
 @app.route('/')

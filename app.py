@@ -1,12 +1,14 @@
 from flask import Flask, request, jsonify, render_template
 import sqlite3
 from flask_cors import CORS
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})  # Allow CORS for API routes
 
 # Database Setup and Utility Functions
 DB_FILE = 'bikerental.db'
+
 
 def init_db():
     """Initialize the database with required tables."""
@@ -28,11 +30,13 @@ def init_db():
         )''')
         print("Database initialized successfully.")
 
+
 def get_db_connection():
     """Get a connection to the database."""
     conn = sqlite3.connect(DB_FILE)
     conn.row_factory = sqlite3.Row
     return conn
+
 
 # Initialize the database
 init_db()
@@ -54,6 +58,18 @@ def add_bike():
     except Exception as e:
         return jsonify({'error': f'An error occurred: {e}'}), 500
 
+
+@app.route('/api/bikes', methods=['GET'])
+def get_bikes():
+    """Fetch all bikes from the database."""
+    try:
+        with get_db_connection() as conn:
+            bikes = conn.execute("SELECT * FROM bikes").fetchall()
+        return jsonify([{'id': bike['id'], 'model': bike['model']} for bike in bikes]), 200
+    except Exception as e:
+        return jsonify({'error': f'An error occurred: {e}'}), 500
+
+
 @app.route('/api/bikes/<bike_id>', methods=['PUT'])
 def update_bike(bike_id):
     """Update bike details."""
@@ -71,16 +87,6 @@ def update_bike(bike_id):
         return jsonify({'error': f'An error occurred: {e}'}), 500
 
 
-@app.route('/api/bikes', methods=['GET'])
-def get_bikes():
-    """Fetch all bikes from the database."""
-    try:
-        with get_db_connection() as conn:
-            bikes = conn.execute("SELECT * FROM bikes").fetchall()
-        return jsonify([{'id': bike['id'], 'model': bike['model']} for bike in bikes]), 200
-    except Exception as e:
-        return jsonify({'error': f'An error occurred: {e}'}), 500
-
 @app.route('/api/bikes/<bike_id>', methods=['DELETE'])
 def delete_bike(bike_id):
     """Delete a bike from the database."""
@@ -94,7 +100,6 @@ def delete_bike(bike_id):
         return jsonify({'error': f'An error occurred: {e}'}), 500
 
 
-
 # Routes for Customers
 @app.route('/api/customers', methods=['POST'])
 def add_customer():
@@ -105,13 +110,14 @@ def add_customer():
 
     try:
         with get_db_connection() as conn:
-            conn.execute("INSERT INTO customers (id, name, contact) VALUES (?, ?, ?)", 
+            conn.execute("INSERT INTO customers (id, name, contact) VALUES (?, ?, ?)",
                          (data['id'], data['name'], data['contact']))
         return jsonify({'message': 'Customer added successfully.', 'customer': data}), 201
     except sqlite3.IntegrityError:
         return jsonify({'error': 'Customer ID already exists.'}), 400
     except Exception as e:
         return jsonify({'error': f'An error occurred: {e}'}), 500
+
 
 @app.route('/api/customers', methods=['GET'])
 def get_customers():
@@ -122,6 +128,7 @@ def get_customers():
         return jsonify([{'id': customer['id'], 'name': customer['name'], 'contact': customer['contact']} for customer in customers]), 200
     except Exception as e:
         return jsonify({'error': f'An error occurred: {e}'}), 500
+
 
 @app.route('/api/customers/<customer_id>', methods=['PUT'])
 def update_customer(customer_id):
@@ -142,6 +149,7 @@ def update_customer(customer_id):
     except Exception as e:
         return jsonify({'error': f'An error occurred: {e}'}), 500
 
+
 @app.route('/api/customers/<customer_id>', methods=['DELETE'])
 def delete_customer(customer_id):
     """Delete a customer from the database."""
@@ -155,6 +163,58 @@ def delete_customer(customer_id):
         return jsonify({'error': f'An error occurred: {e}'}), 500
 
 
+# Authentication Routes
+@app.route('/api/register', methods=['POST'])
+def register():
+    """Register a new user or allow direct login if already registered."""
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        return jsonify({'error': 'Username and password are required'}), 400
+
+    try:
+        with get_db_connection() as conn:
+            # Check if the user is already registered
+            user = conn.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
+            if user:
+                # If user exists, verify the password
+                if check_password_hash(user['password'], password):
+                    return jsonify({'message': 'User already registered. Logged in successfully!'}), 200
+                else:
+                    return jsonify({'error': 'Incorrect password for registered user.'}), 401
+
+            # If user does not exist, register them
+            hashed_password = generate_password_hash(password)
+            conn.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, hashed_password))
+            return jsonify({'message': 'User registered successfully!'}), 201
+    except sqlite3.IntegrityError:
+        return jsonify({'error': 'Username already exists'}), 400
+    except Exception as e:
+        return jsonify({'error': f'An error occurred: {e}'}), 500
+
+
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    """Log in an existing user."""
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        return jsonify({'error': 'Invalid input. Provide both username and password'}), 400
+
+    try:
+        with get_db_connection() as conn:
+            user = conn.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
+            if user and check_password_hash(user['password'], password):
+                return jsonify({'message': 'Login successful!'}), 200
+            return jsonify({'error': 'Invalid username or password'}), 401
+    except Exception as e:
+        return jsonify({'error': f'An error occurred: {e}'}), 500
+
 
 
 # Home Route
@@ -162,6 +222,7 @@ def delete_customer(customer_id):
 def index():
     """Render the homepage."""
     return render_template('index.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

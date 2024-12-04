@@ -123,6 +123,26 @@ def get_customers():
     except Exception as e:
         return jsonify({'error': f'An error occurred: {e}'}), 500
 
+@app.route('/api/customers/<customer_id>', methods=['PUT'])
+def update_customer(customer_id):
+    """Update a customer's details."""
+    data = request.get_json()
+    if not data or 'name' not in data or 'contact' not in data:
+        return jsonify({'error': 'Invalid input. Provide customer name and contact.'}), 400
+
+    try:
+        with get_db_connection() as conn:
+            result = conn.execute(
+                "UPDATE customers SET name = ?, contact = ? WHERE id = ?",
+                (data['name'], data['contact'], customer_id)
+            )
+            if result.rowcount == 0:
+                return jsonify({'error': 'Customer not found.'}), 404
+        return jsonify({'message': 'Customer updated successfully.'}), 200
+    except Exception as e:
+        return jsonify({'error': f'An error occurred: {e}'}), 500
+
+
 # Home Route
 @app.route('/')
 def index():

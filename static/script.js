@@ -1,4 +1,5 @@
 const apiUrl = 'http://127.0.0.1:5000/api';
+// Base URL without "/api"
 
 /**
  * Helper function to send API requests
@@ -28,11 +29,59 @@ async function apiRequest(endpoint, method, data = null) {
     }
 }
 
-/** --------------------- CRUD for Bikes --------------------- **/
+/** --------------------- Authentication --------------------- **/
 
 /**
- * Insert new bike data
+ * Handle user registration
  */
+async function register() {
+    const username = document.getElementById('registerUsername').value.trim();
+    const password = document.getElementById('registerPassword').value.trim();
+
+    if (!username || !password) {
+        alert('Please provide both username and password');
+        return;
+    }
+
+    const data = await apiRequest('register', 'POST', { username, password });
+    const message = document.getElementById('registerMessage');
+    if (data && data.message) {
+        message.textContent = data.message;
+        message.style.color = 'green';
+        toggleVisibility('registerSection', 'loginSection');
+    } else {
+        message.textContent = data.error;
+        message.style.color = 'red';
+    }
+}
+
+/**
+ * Handle user login
+ */
+async function login() {
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+
+    if (!username || !password) {
+        alert('Please provide both username and password');
+        return;
+    }
+
+    const data = await apiRequest('login', 'POST', { username, password });
+    const message = document.getElementById('loginMessage');
+    if (data && data.message) {
+        message.textContent = data.message;
+        message.style.color = 'green';
+        toggleVisibility('loginSection', ['bikeInventorySection', 'customerManagementSection']);
+    } else {
+        message.textContent = data.error;
+        message.style.color = 'red';
+    }
+}
+
+
+/** --------------------- CRUD for Bikes --------------------- **/
+
 async function insertBikeData() {
     const bikeId = document.getElementById('bikeId').value.trim();
     const bikeModel = document.getElementById('bikeModel').value.trim();
@@ -52,18 +101,12 @@ async function insertBikeData() {
     }
 }
 
-/**
- * Fetch and display all bikes
- */
 async function getBikes() {
     const bikes = await apiRequest('bikes', 'GET');
     const list = document.getElementById('bikesList');
     list.innerHTML = `<h3>Bike Inventory</h3>${formatList(bikes, 'id', 'model')}`;
 }
 
-/**
- * Update bike data
- */
 async function updateBikeData() {
     const bikeId = document.getElementById('bikeId').value.trim();
     const bikeModel = document.getElementById('bikeModel').value.trim();
@@ -83,9 +126,6 @@ async function updateBikeData() {
     }
 }
 
-/**
- * Delete a bike
- */
 async function deleteBike() {
     const bikeId = document.getElementById('bikeId').value.trim();
 
@@ -105,9 +145,6 @@ async function deleteBike() {
 
 /** --------------------- CRUD for Customers --------------------- **/
 
-/**
- * Insert new customer data
- */
 async function insertCustomerData() {
     const customerId = document.getElementById('customerId').value.trim();
     const customerName = document.getElementById('customerName').value.trim();
@@ -128,18 +165,12 @@ async function insertCustomerData() {
     }
 }
 
-/**
- * Fetch and display all customers
- */
 async function getCustomers() {
     const customers = await apiRequest('customers', 'GET');
     const list = document.getElementById('customersList');
     list.innerHTML = `<h3>Customer Profiles</h3>${formatList(customers, 'id', 'name', 'contact')}`;
 }
 
-/**
- * Update customer data
- */
 async function updateCustomerData() {
     const customerId = document.getElementById('customerId').value.trim();
     const customerName = document.getElementById('customerName').value.trim();
@@ -160,9 +191,6 @@ async function updateCustomerData() {
     }
 }
 
-/**
- * Delete a customer
- */
 async function deleteCustomer() {
     const customerId = document.getElementById('customerId').value.trim();
 
@@ -182,12 +210,6 @@ async function deleteCustomer() {
 
 /** --------------------- Utility Functions --------------------- **/
 
-/**
- * Utility function to format a list of items into HTML
- * @param {Array} items - List of items to display
- * @param {string[]} keys - Keys for the fields
- * @returns {string} - Formatted HTML string
- */
 function formatList(items, ...keys) {
     if (!items || items.length === 0) return '<p>No items available.</p>';
     return items
@@ -195,10 +217,6 @@ function formatList(items, ...keys) {
         .join('');
 }
 
-/**
- * Utility function to clear input fields
- * @param {string[]} fieldIds - Array of input field IDs to clear
- */
 function clearInputFields(fieldIds) {
     fieldIds.forEach(id => {
         const field = document.getElementById(id);
@@ -206,7 +224,25 @@ function clearInputFields(fieldIds) {
     });
 }
 
+/**
+ * Toggle visibility of sections
+ * @param {string} hideId - ID of the section to hide
+ * @param {string|string[]} showIds - ID(s) of the section(s) to show
+ */
+function toggleVisibility(hideId, showIds) {
+    document.getElementById(hideId).style.display = 'none';
+    if (Array.isArray(showIds)) {
+        showIds.forEach(id => (document.getElementById(id).style.display = 'block'));
+    } else {
+        document.getElementById(showIds).style.display = 'block';
+    }
+}
+
 /** --------------------- Event Listeners --------------------- **/
+
+// Authentication Event Listeners
+document.getElementById('loginBtn').addEventListener('click', login);
+document.getElementById('registerBtn').addEventListener('click', register);
 
 // Bike Event Listeners
 document.getElementById('addBikeBtn').addEventListener('click', insertBikeData);

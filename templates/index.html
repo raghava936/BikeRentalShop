@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -41,7 +42,8 @@
         }
         /* Input Fields */
         
-        input[type="text"] {
+        input[type="text"],
+        input[type="password"] {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
@@ -105,7 +107,8 @@
                 width: 100%;
                 margin-top: 10px;
             }
-            input[type="text"] {
+            input[type="text"],
+            input[type="password"] {
                 width: 100%;
             }
         }
@@ -116,8 +119,26 @@
     <div class="container">
         <h1>Bike Rental Shop</h1>
 
+        <!-- Registration Section -->
+        <section id="registerSection">
+            <h2>Register</h2>
+            <input type="text" id="registerUsername" placeholder="Username">
+            <input type="password" id="registerPassword" placeholder="Password">
+            <button id="registerBtn">Register</button>
+            <div id="registerMessage" class="data-list"></div>
+        </section>
+
+        <!-- Login Section -->
+        <section id="loginSection" style="display: none;">
+            <h2>Login</h2>
+            <input type="text" id="loginUsername" placeholder="Username">
+            <input type="password" id="loginPassword" placeholder="Password">
+            <button id="loginBtn">Login</button>
+            <div id="loginMessage" class="data-list"></div>
+        </section>
+
         <!-- Bike Inventory Management -->
-        <section>
+        <section id="bikeInventorySection" style="display: none;">
             <h2>Bike Inventory</h2>
             <input type="text" id="bikeId" placeholder="Bike ID">
             <input type="text" id="bikeModel" placeholder="Bike Model">
@@ -131,7 +152,7 @@
         </section>
 
         <!-- Customer Management -->
-        <section>
+        <section id="customerManagementSection" style="display: none;">
             <h2>Customer Profiles</h2>
             <input type="text" id="customerId" placeholder="Customer ID">
             <input type="text" id="customerName" placeholder="Customer Name">

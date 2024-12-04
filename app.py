@@ -81,6 +81,20 @@ def get_bikes():
     except Exception as e:
         return jsonify({'error': f'An error occurred: {e}'}), 500
 
+@app.route('/api/bikes/<bike_id>', methods=['DELETE'])
+def delete_bike(bike_id):
+    """Delete a bike from the database."""
+    try:
+        with get_db_connection() as conn:
+            result = conn.execute("DELETE FROM bikes WHERE id = ?", (bike_id,))
+            if result.rowcount == 0:
+                return jsonify({'error': 'Bike not found.'}), 404
+        return jsonify({'message': 'Bike deleted successfully.'}), 200
+    except Exception as e:
+        return jsonify({'error': f'An error occurred: {e}'}), 500
+
+
+
 # Routes for Customers
 @app.route('/api/customers', methods=['POST'])
 def add_customer():

@@ -21,6 +21,11 @@ def init_db():
             name TEXT NOT NULL, 
             contact TEXT NOT NULL
         )''')
+        cursor.execute('''CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT, 
+            username TEXT UNIQUE NOT NULL, 
+            password TEXT NOT NULL
+        )''')
         print("Database initialized successfully.")
 
 def get_db_connection():

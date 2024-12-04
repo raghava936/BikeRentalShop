@@ -54,6 +54,23 @@ def add_bike():
     except Exception as e:
         return jsonify({'error': f'An error occurred: {e}'}), 500
 
+@app.route('/api/bikes/<bike_id>', methods=['PUT'])
+def update_bike(bike_id):
+    """Update bike details."""
+    data = request.get_json()
+    if not data or 'model' not in data:
+        return jsonify({'error': 'Invalid input. Provide bike model.'}), 400
+
+    try:
+        with get_db_connection() as conn:
+            result = conn.execute("UPDATE bikes SET model = ? WHERE id = ?", (data['model'], bike_id))
+            if result.rowcount == 0:
+                return jsonify({'error': 'Bike not found.'}), 404
+        return jsonify({'message': 'Bike updated successfully.'}), 200
+    except Exception as e:
+        return jsonify({'error': f'An error occurred: {e}'}), 500
+
+
 @app.route('/api/bikes', methods=['GET'])
 def get_bikes():
     """Fetch all bikes from the database."""
